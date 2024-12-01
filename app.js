@@ -1,17 +1,55 @@
-document.getElementById('searchButton').addEventListener('click', () => {
-    const searchValue = document.getElementById('searchInput').value;
-    window.api.sendSearch(searchValue); // Use the exposed API to send the search term
+document.getElementById('searchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') initiateSearch();
 });
 
+function initiateSearch() {
+    const searchValue = document.getElementById('searchInput').value.trim();
+    if (!searchValue) return;
+
+    const statusElement = document.querySelector('.status');
+    statusElement.textContent = 'Fetching image...';
+
+    window.api.sendSearch(searchValue);
+}
+
 window.api.onImageResult((imageUrl) => {
+    const searchValue = document.getElementById('searchInput').value.trim();
     const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = ''; // Clear previous results
+    const statusElement = document.querySelector('.status');
+
     if (imageUrl) {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+
         const img = document.createElement('img');
         img.src = imageUrl;
-        img.style.width = '100px'; // Set width to maximum
-        resultDiv.appendChild(img);
+
+        const title = document.createElement('div');
+        title.className = 'tile-title';
+        title.textContent = searchValue;
+
+        const description = document.createElement('div');
+        description.className = 'description';
+        description.innerHTML = `
+            <div class="rating">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </div>
+            <div>Favorited: No</div>
+            <div>Status: Not read</div>
+        `;
+
+        tile.appendChild(img);
+        tile.appendChild(title);
+        tile.appendChild(description);
+
+        tile.addEventListener('click', () => {
+            const newTitle = prompt('Edit Title', searchValue);
+            if (newTitle) title.textContent = newTitle;
+        });
+
+        resultDiv.appendChild(tile);
+        statusElement.textContent = 'Image fetched successfully.';
     } else {
-        resultDiv.textContent = 'No image found.';
+        statusElement.textContent = 'No image found.';
     }
 });
