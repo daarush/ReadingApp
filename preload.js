@@ -5,9 +5,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-    sendSearch: (searchValue) => ipcRenderer.send('search-images', searchValue),
-    onImageResult: (callback) => ipcRenderer.on('image-result', (event, imageUrl) => callback(imageUrl)),
+  sendSearch: (searchValue) => ipcRenderer.send('search-images', searchValue),
+  onImageResult: (callback) => ipcRenderer.on('image-result', (event, result) => callback(result.imageUrl, result.searchValue)),
 });
+
 
 
 window.addEventListener('DOMContentLoaded', () => {

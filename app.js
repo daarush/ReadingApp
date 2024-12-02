@@ -6,14 +6,30 @@ function initiateSearch() {
     const searchValue = document.getElementById('searchInput').value.trim();
     if (!searchValue) return;
 
+    const regex = /`(.*?)`/g;
+    const match = searchValue.match(regex);
+
+    const text = searchValue.replace(regex, '').trim();
+
+    let extratedText = "";
+    if (match) {
+        extratedText = match.map(item => item.replace(/`/g, ''));
+    }
+
+    const newSearchValue = (text + " " + extratedText).trim();
+
     const statusElement = document.querySelector('.status');
     statusElement.textContent = 'Fetching image...';
 
-    window.api.sendSearch(searchValue);
+    window.api.sendSearch(newSearchValue);
 }
 
-window.api.onImageResult((imageUrl) => {
-    const searchValue = document.getElementById('searchInput').value.trim();
+window.api.onImageResult((imageUrl, searchValue) => {
+    searchValue = searchValue.trim();
+
+    const regex = /`(.*?)`/g;
+    const cleanTitle = searchValue.replace(regex, '').trim();
+
     const resultDiv = document.getElementById('result');
     const statusElement = document.querySelector('.status');
 
@@ -25,11 +41,11 @@ window.api.onImageResult((imageUrl) => {
         const img = document.createElement('img');
         img.src = imageUrl;
 
-        // Editable title
+        // Editable title (without text between backticks)
         const title = document.createElement('div');
         title.className = 'tile-title';
         title.contentEditable = true;
-        title.textContent = searchValue;
+        title.textContent = cleanTitle;  // Set the title to the cleaned version
 
         // Description container
         const description = document.createElement('div');

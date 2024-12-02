@@ -41,7 +41,7 @@ ipcMain.on('search-images', async (event, searchValue) => {
 
       await browser.close();
 
-      event.reply('image-result', firstImageSource);
+      event.reply('image-result', { imageUrl: firstImageSource, searchValue });
   } catch (error) {
       console.error("Error during Puppeteer operation:", error);
   }
