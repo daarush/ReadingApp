@@ -43,7 +43,7 @@ window.api.onImageResult((imageUrl) => {
             star.textContent = '★';
             star.dataset.rating = i;
             star.style.color = i <= 3 ? 'gold' : 'gray'; // Default rating: 3 stars
-            star.addEventListener('click', (e) => {
+            star.addEventListener('click', () => {
                 const stars = rating.querySelectorAll('span');
                 stars.forEach((s, index) => {
                     s.style.color = index < i ? 'gold' : 'gray';
@@ -66,15 +66,23 @@ window.api.onImageResult((imageUrl) => {
         // Heart icon for favorite
         const heartIcon = document.createElement('div');
         heartIcon.className = 'heart-icon';
-        heartIcon.style.position = 'absolute';
-        heartIcon.style.top = '8px';
-        heartIcon.style.right = '8px';
-        heartIcon.style.color = 'transparent'; // Initially hidden
         heartIcon.textContent = '❤️';
 
         tile.addEventListener('dblclick', () => {
             const isFavorited = heartIcon.style.color === 'red';
             heartIcon.style.color = isFavorited ? 'transparent' : 'red';
+        });
+
+        // Toggle button (emoji) for hiding/unhiding the image
+        const toggleButton = document.createElement('div');
+        toggleButton.className = 'toggle-button';
+        toggleButton.textContent = '👁️';
+
+        let isImageHidden = false;
+        toggleButton.addEventListener('click', () => {
+            isImageHidden = !isImageHidden;
+            img.style.display = isImageHidden ? 'none' : 'block';
+            tile.style.height = isImageHidden ? '110px' : '220px'; // Dynamically adjust height
         });
 
         description.appendChild(rating);
@@ -84,6 +92,7 @@ window.api.onImageResult((imageUrl) => {
         tile.appendChild(title);
         tile.appendChild(description);
         tile.appendChild(heartIcon);
+        tile.appendChild(toggleButton);
 
         resultDiv.appendChild(tile);
         statusElement.textContent = 'Image fetched successfully.';
