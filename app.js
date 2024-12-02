@@ -82,14 +82,13 @@ window.api.onImageResult((imageUrl) => {
         toggleButton.addEventListener('click', () => {
             isImageHidden = !isImageHidden;
             img.style.display = isImageHidden ? 'none' : 'block';
-            tile.style.height = isImageHidden ? '110px' : '220px'; // Dynamically adjust height
+            tile.style.height = isImageHidden ? '125px' : '250px'; // Dynamically adjust height
         });
 
+        description.appendChild(title);
         description.appendChild(rating);
         description.appendChild(readingStatus);
-
         tile.appendChild(img);
-        tile.appendChild(title);
         tile.appendChild(description);
         tile.appendChild(heartIcon);
         tile.appendChild(toggleButton);
