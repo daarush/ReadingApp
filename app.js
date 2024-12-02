@@ -81,8 +81,7 @@ window.api.onImageResult((imageUrl) => {
         let isImageHidden = false;
         toggleButton.addEventListener('click', () => {
             isImageHidden = !isImageHidden;
-            img.style.display = isImageHidden ? 'none' : 'block';
-            tile.style.height = isImageHidden ? '125px' : '250px'; // Dynamically adjust height
+            img.style.filter = isImageHidden ? 'blur(10px)' : 'none';
         });
 
         description.appendChild(title);
