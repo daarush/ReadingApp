@@ -70,7 +70,7 @@ window.api.onImageResult((imageUrl, searchValue) => {
 
         // Editable reading status
         const readingStatus = document.createElement('div');
-        const readingStates = ['Not read', 'Reading', 'Read'];
+        const readingStates = ['Plan To Read', 'Reading', 'Read', 'Hold', 'Dropped', 'Hiatus'];
         let currentStatusIndex = 0; // Default: 'Not read'
         readingStatus.textContent = `Status: ${readingStates[currentStatusIndex]}`;
         readingStatus.style.cursor = 'pointer';
