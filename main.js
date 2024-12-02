@@ -11,7 +11,8 @@ function createWindow() {
             contextIsolation: true,
             enableRemoteModule: false,
             nodeIntegration: false 
-        }
+        },
+        autoHideMenuBar: true
     });
 
     win.loadFile('index.html');
