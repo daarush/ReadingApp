@@ -1,3 +1,8 @@
+// TODO: double click to favorite also happens when double clicking on the text
+// TODO: clear input automatically
+// TODO: first letter of title should be captialized
+// TODO: reoranize the tiles by draggi
+
 document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') initiateSearch();
 });
