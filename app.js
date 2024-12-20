@@ -1,8 +1,5 @@
 // app.js
 
-// TODO: double click to favorite also happens when double clicking on the text
-// TODO: reoranize the tiles by dragging them
-
 document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') initiateSearch();
 });
@@ -53,6 +50,7 @@ window.api.onImageResult((imageUrl, searchValue) => {
         // Image element
         const img = document.createElement('img');
         img.src = imageUrl;
+        img.setAttribute('draggable', 'false');
 
         // Editable title (without text between backticks)
         const title = document.createElement('div');
@@ -97,7 +95,7 @@ window.api.onImageResult((imageUrl, searchValue) => {
         heartIcon.className = 'heart-icon';
         heartIcon.textContent = '❤️';
 
-        tile.addEventListener('dblclick', () => {
+        img.addEventListener('dblclick', () => {
             const isFavorited = heartIcon.style.color === 'red';
             heartIcon.style.color = isFavorited ? 'transparent' : 'red';
         });
