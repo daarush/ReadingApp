@@ -1,5 +1,3 @@
-// app.js
-
 document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') initiateSearch();
 });
@@ -34,6 +32,8 @@ function toCamelCase(string) {
         .join(' ');
 }
 
+let currentPanelTile = null;
+
 window.api.onImageResult((imageUrl, searchValue) => {
     searchValue = searchValue.trim();
 
@@ -44,84 +44,203 @@ window.api.onImageResult((imageUrl, searchValue) => {
     const statusElement = document.querySelector('.status');
 
     if (imageUrl) {
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-
-        // Image element
-        const img = document.createElement('img');
-        img.src = imageUrl;
-        img.setAttribute('draggable', 'false');
-
-        // Editable title (without text between backticks)
-        const title = document.createElement('div');
-        title.className = 'tile-title';
-        title.contentEditable = true;
-        title.textContent = cleanTitle;  // Set the title to the cleaned version
-
-        // Description container
-        const description = document.createElement('div');
-        description.className = 'description';
-
-        // Editable rating
-        const rating = document.createElement('div');
-        rating.className = 'rating';
-        for (let i = 1; i <= 5; i++) {
-            const star = document.createElement('span');
-            star.textContent = '★';
-            star.dataset.rating = i;
-            star.style.color = i <= 3 ? 'gold' : 'gray'; // Default rating: 3 stars
-            star.addEventListener('click', () => {
-                const stars = rating.querySelectorAll('span');
-                stars.forEach((s, index) => {
-                    s.style.color = index < i ? 'gold' : 'gray';
-                });
-            });
-            rating.appendChild(star);
-        }
-
-        // Editable reading status
-        const readingStatus = document.createElement('div');
-        const readingStates = ['Plan To Read', 'Reading', 'Read', 'Hold', 'Dropped', 'Hiatus'];
-        let currentStatusIndex = 0; // Default: 'Not read'
-        readingStatus.textContent = `Status: ${readingStates[currentStatusIndex]}`;
-        readingStatus.style.cursor = 'pointer';
-        readingStatus.addEventListener('click', () => {
-            currentStatusIndex = (currentStatusIndex + 1) % readingStates.length;
-            readingStatus.textContent = `Status: ${readingStates[currentStatusIndex]}`;
-        });
-
-        // Heart icon for favorite
-        const heartIcon = document.createElement('div');
-        heartIcon.className = 'heart-icon';
-        heartIcon.textContent = '❤️';
-
-        img.addEventListener('dblclick', () => {
-            const isFavorited = heartIcon.style.color === 'red';
-            heartIcon.style.color = isFavorited ? 'transparent' : 'red';
-        });
-
-        // Toggle button (emoji) for hiding/unhiding the image
-        const toggleButton = document.createElement('div');
-        toggleButton.className = 'toggle-button';
-        toggleButton.textContent = '👁️';
-
-        let isImageHidden = false;
-        toggleButton.addEventListener('click', () => {
-            isImageHidden = !isImageHidden;
-            img.style.filter = isImageHidden ? 'blur(10px)' : 'none';
-        });
-
-        description.appendChild(title);
-        description.appendChild(rating);
-        description.appendChild(readingStatus);
-        tile.appendChild(img);
-        tile.appendChild(description);
-        tile.appendChild(heartIcon);
-        tile.appendChild(toggleButton);
-
+        const tile = createTile(cleanTitle, imageUrl);
         resultDiv.appendChild(tile);
         statusElement.textContent = 'Image fetched successfully.';
     } else {
         statusElement.textContent = 'No image found.';
     }
 });
+
+function createTile(title, imageUrl) {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+
+    // Image element
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.setAttribute('draggable', 'false');
+
+    // Non-editable title
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'tile-title';
+    titleDiv.textContent = title;
+
+    // Description container
+    const description = document.createElement('div');
+    description.className = 'description';
+
+    // Editable rating
+    const rating = createRating(0); // Start rating at 0
+
+    // Heart icon for favorite
+    const heartIcon = document.createElement('div');
+    heartIcon.className = 'heart-icon';
+    heartIcon.textContent = '❤️';
+    heartIcon.style.color = 'transparent';
+
+    img.addEventListener('dblclick', () => {
+        toggleFavorite(heartIcon, tile);
+        if (currentPanelTile === tile) updatePanel();
+    });
+
+    // Open side panel on tile click
+    tile.addEventListener('click', () => {
+        currentPanelTile = tile;
+        showSidePanel(tile, title, imageUrl, rating);
+    });
+
+    // Append elements
+    description.appendChild(titleDiv);
+    description.appendChild(rating);
+    tile.appendChild(img);
+    tile.appendChild(description);
+    tile.appendChild(heartIcon);
+
+    return tile;
+}
+
+function createRating(initialRating) {
+    const rating = document.createElement('div');
+    rating.className = 'rating';
+
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.textContent = '★';
+        star.dataset.rating = i;
+        star.style.color = i <= initialRating ? 'gold' : 'gray'; // Start with the initial rating
+        star.addEventListener('click', () => {
+            updateRating(rating, i); // Update rating in tile
+            if (currentPanelTile) updatePanel();
+        });
+        rating.appendChild(star);
+    }
+    return rating;
+}
+
+function updateRating(ratingElement, ratingValue) {
+    const stars = ratingElement.querySelectorAll('span');
+    stars.forEach((star, index) => {
+        star.style.color = index < ratingValue ? 'gold' : 'gray';
+    });
+}
+
+function toggleFavorite(heartIcon, tile) {
+    const isFavorited = heartIcon.style.color === 'red';
+    heartIcon.style.color = isFavorited ? 'transparent' : 'red';
+    if (currentPanelTile === tile) updatePanel();
+}
+
+function showSidePanel(tile, title, imageUrl, tileRating) {
+    let sidePanel = document.getElementById('sidePanel');
+    if (!sidePanel) {
+        sidePanel = document.createElement('div');
+        sidePanel.id = 'sidePanel';
+        sidePanel.style.cssText = `
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: #1a1a1a;
+            color: #f0f0f0;
+            padding: 20px;
+            box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        `;
+        document.body.appendChild(sidePanel);
+    }
+
+    sidePanel.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0;">Edit Tile</h3>
+            <button id="closePanel" style="
+                background: none;
+                border: none;
+                color: #f0f0f0;
+                font-size: 18px;
+                cursor: pointer;">✖</button>
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 5px;">Title:</label>
+            <input type="text" id="panelTitle" value="${tile.querySelector('.tile-title').textContent}" style="
+                width: 100%;
+                padding: 5px;
+                border: 1px solid #333;
+                border-radius: 4px;
+                background: #2a2a2a;
+                color: #f0f0f0;">
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 5px;">Rating:</label>
+            <div id="panelRating" class="rating"></div>
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 5px;">Favorite:</label>
+            <button id="panelFavorite" style="
+                padding: 5px 10px;
+                border: none;
+                border-radius: 4px;
+                background: ${tile.querySelector('.heart-icon').style.color === 'red' ? '#ff4d4d' : '#333'};
+                color: #f0f0f0;
+                cursor: pointer;">
+                ${tile.querySelector('.heart-icon').style.color === 'red' ? 'Unfavorite' : 'Favorite'}
+            </button>
+        </div>
+    `;
+
+    // Close panel
+    document.getElementById('closePanel').addEventListener('click', () => {
+        sidePanel.style.display = 'none';
+        currentPanelTile = null;
+    });
+
+    // Sync title
+    document.getElementById('panelTitle').addEventListener('input', (e) => {
+        tile.querySelector('.tile-title').textContent = e.target.value;
+    });
+
+    // Sync favorite
+    document.getElementById('panelFavorite').addEventListener('click', (e) => {
+        const heartIcon = tile.querySelector('.heart-icon');
+        toggleFavorite(heartIcon, tile);
+        e.target.textContent = heartIcon.style.color === 'red' ? 'Unfavorite' : 'Favorite';
+        e.target.style.background = heartIcon.style.color === 'red' ? '#ff4d4d' : '#333';
+    });
+
+    // Sync rating in the side panel
+    const panelRating = document.getElementById('panelRating');
+    panelRating.innerHTML = ''; // Clear existing stars
+
+    const currentRating = Array.from(tileRating.querySelectorAll('span')).filter(star => star.style.color === 'gold').length;
+    
+    // Create stars for side panel based on current rating
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.textContent = '★';
+        star.dataset.rating = i;
+        star.style.color = i <= currentRating ? 'gold' : 'gray'; // Sync with the current rating
+        star.addEventListener('click', () => {
+            updateRating(panelRating, i); // Update panel rating
+            updateRating(tileRating, i);  // Update tile rating
+        });
+        panelRating.appendChild(star);
+    }
+
+    sidePanel.style.display = 'flex';
+}
+
+function updatePanel() {
+    if (!currentPanelTile) return;
+
+    const heartIcon = currentPanelTile.querySelector('.heart-icon');
+    const isFavorited = heartIcon.style.color === 'red';
+    const panelFavoriteButton = document.getElementById('panelFavorite');
+
+    // Sync favorite
+    panelFavoriteButton.textContent = isFavorited ? 'Unfavorite' : 'Favorite';
+    panelFavoriteButton.style.background = isFavorited ? '#ff4d4d' : '#333';
+}
