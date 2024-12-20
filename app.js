@@ -1,7 +1,7 @@
+// app.js
+
 // TODO: double click to favorite also happens when double clicking on the text
-// TODO: clear input automatically
-// TODO: first letter of title should be captialized
-// TODO: reoranize the tiles by draggi
+// TODO: reoranize the tiles by dragging them
 
 document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') initiateSearch();
@@ -27,13 +27,21 @@ function initiateSearch() {
     statusElement.textContent = 'Fetching image...';
 
     window.api.sendSearch(newSearchValue);
+    document.getElementById('searchInput').value = '';
+}
+
+function toCamelCase(string) {
+    return string
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
 }
 
 window.api.onImageResult((imageUrl, searchValue) => {
     searchValue = searchValue.trim();
 
     const regex = /`(.*?)`/g;
-    const cleanTitle = searchValue.replace(regex, '').trim();
+    const cleanTitle = toCamelCase(searchValue.replace(regex, '').trim());
 
     const resultDiv = document.getElementById('result');
     const statusElement = document.querySelector('.status');
