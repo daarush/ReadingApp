@@ -155,16 +155,18 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
     }
 
     sidePanel.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin: 0;">Edit Tile</h3>
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <h3 style="margin: 0;">Edit</h3>
             <button id="closePanel" style="
                 background: none;
                 border: none;
                 color: #f0f0f0;
                 font-size: 18px;
-                cursor: pointer;">✖</button>
+                cursor: pointer;
+                position: absolute;
+                right: 20px;">✖</button>
         </div>
-        <div>
+        <div style="margin-top: 20px;">
             <label style="display: block; margin-bottom: 5px;">Title:</label>
             <input type="text" id="panelTitle" value="${tile.querySelector('.tile-title').textContent}" style="
                 width: 100%;
@@ -172,14 +174,16 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
                 border: 1px solid #333;
                 border-radius: 4px;
                 background: #2a2a2a;
-                color: #f0f0f0;">
+                color: #f0f0f0;
+                outline: none;
+                ">
         </div>
-        <div>
+        <div style="margin-top: 20px;">
             <label style="display: block; margin-bottom: 5px;">Rating:</label>
             <div id="panelRating" class="rating"></div>
         </div>
-        <div>
-            <label style="display: block; margin-bottom: 5px;">Favorite:</label>
+        <div style="margin-top: 20px;">
+            <label style="display: inline-block; margin-bottom: 5px; margin-right: 10px;">Favorite:</label>
             <button id="panelFavorite" style="
                 padding: 5px 10px;
                 border: none;
