@@ -2,6 +2,13 @@ document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') initiateSearch();
 });
 
+const existingTitles = [
+    { title: "Title 1", type: "Type A" },
+    { title: "Title 2", type: "Type B" },
+    { title: "Title 3", type: "Type A" },
+    { title: "Title 4", type: "" }
+];
+
 function initiateSearch() {
     const searchValue = document.getElementById('searchInput').value.trim();
     if (!searchValue) return;
@@ -18,11 +25,28 @@ function initiateSearch() {
 
     const newSearchValue = (text + " " + extratedText).trim();
 
+    if (titleExists(text, extratedText)) {
+        const statusElement = document.querySelector('.status');
+        statusElement.textContent = 'Title Already Exists';
+        statusElement.style.color = 'red';
+        statusElement.classList.add('shake');
+        setTimeout(() => statusElement.classList.remove('shake'), 1000);
+        return;
+    }
+
+    // Add the new title to the existingTitles array
+    existingTitles.push({ title: text, type: extratedText });
+
     const statusElement = document.querySelector('.status');
     statusElement.textContent = 'Fetching image...';
+    statusElement.style.color = ''; // Reset color
 
     window.api.sendSearch(newSearchValue);
     document.getElementById('searchInput').value = '';
+}
+
+function titleExists(title, type) {
+    return existingTitles.some(item => item.title.toLowerCase() === title.toLowerCase() && item.type.toLowerCase() === type.toLowerCase());
 }
 
 function toCamelCase(string) {
@@ -96,7 +120,6 @@ function createTile(title, imageUrl) {
     tile.appendChild(img);
     tile.appendChild(description);
     tile.appendChild(heartIcon);
-
     return tile;
 }
 
@@ -248,3 +271,20 @@ function updatePanel() {
     panelFavoriteButton.textContent = isFavorited ? 'Unfavorite' : 'Favorite';
     panelFavoriteButton.style.background = isFavorited ? '#ff4d4d' : '#333';
 }
+
+// Add CSS for shake animation
+const style = document.createElement('style');
+style.innerHTML = `
+    .shake {
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+        100% { transform: translateX(0); }
+    }
+`;
+document.head.appendChild(style);
