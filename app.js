@@ -1,3 +1,10 @@
+// TODO: Add a way to remove tiles
+// TODO: Add differnt border colors for different types (create a random color for every new type)
+// TODO: Differentiate between title and type
+// TODO: Add tags + notes
+// TODO: save/load
+// TODO: bulk add / queue
+
 let currentPanelTile = null;
 const statusElement = document.querySelector('.status');
 const resultDiv = document.getElementById('result');
@@ -98,6 +105,7 @@ window.api.onImageResult((imageUrl, searchValue) => {
 function createTile(title, imageUrl) {
     const tile = document.createElement('div');
     tile.className = 'tile';
+    tile.style.animation = 'fadeIn 0.5s ease-in-out';
 
     const img = document.createElement('img');
     img.src = imageUrl;
@@ -185,6 +193,9 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         `;
         document.body.appendChild(sidePanel);
     }
@@ -232,7 +243,8 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
     `;
 
     document.getElementById('closePanel').addEventListener('click', () => {
-        sidePanel.style.display = 'none';
+        sidePanel.style.transform = 'translateX(100%)';
+        sidePanel.style.opacity = '0';
         currentPanelTile = null;
     });
 
@@ -264,6 +276,8 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
         panelRating.appendChild(star);
     }
 
+    sidePanel.style.transform = 'translateX(0)';
+    sidePanel.style.opacity = '1';
     sidePanel.style.display = 'flex';
 }
 
