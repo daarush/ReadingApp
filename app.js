@@ -18,14 +18,13 @@ function initiateSearch() {
 
     const text = searchValue.replace(regex, '').trim();
 
-    let extratedText = "";
+    let extractedType = "";
     if (match) {
-        extratedText = match.map(item => item.replace(/`/g, ''));
+        extractedType = match.map(item => item.replace(/`/g, '')).join(' ');
     }
 
-    const newSearchValue = (text + " " + extratedText).trim();
-
-    if (titleExists(text, extratedText)) {
+    // Check for duplicates
+    if (titleExists(text, extractedType)) {
         const statusElement = document.querySelector('.status');
         statusElement.textContent = 'Title Already Exists';
         statusElement.style.color = 'red';
@@ -35,19 +34,36 @@ function initiateSearch() {
     }
 
     // Add the new title to the existingTitles array
-    existingTitles.push({ title: text, type: extratedText });
+    existingTitles.push({ title: text, type: extractedType });
 
     const statusElement = document.querySelector('.status');
     statusElement.textContent = 'Fetching image...';
     statusElement.style.color = ''; // Reset color
 
+    const newSearchValue = (text + " " + extractedType).trim();
     window.api.sendSearch(newSearchValue);
     document.getElementById('searchInput').value = '';
 }
 
+
 function titleExists(title, type) {
-    return existingTitles.some(item => item.title.toLowerCase() === title.toLowerCase() && item.type.toLowerCase() === type.toLowerCase());
+    return existingTitles.some(item => {
+        const existingTitle = item.title.toLowerCase();
+        const existingType = (item.type || '').toLowerCase();
+        const inputTitle = title.toLowerCase();
+        const inputType = (type || '').toLowerCase();
+
+        // Check for duplicate title and type combination
+        if (existingTitle === inputTitle) {
+            // If no type is provided in either existing or input, consider it a match
+            if (!existingType && !inputType) return true;
+            // If types are provided, they must match
+            if (existingType === inputType) return true;
+        }
+        return false;
+    });
 }
+
 
 function toCamelCase(string) {
     return string
