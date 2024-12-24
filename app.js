@@ -1,5 +1,6 @@
 // TODO: Add a way to remove tiles
 // TODO: Add differnt border colors for different types (create a random color for every new type)
+// TODO: image regeneration
 // TODO: Differentiate between title and type
 // TODO: Add tags + notes
 // TODO: save/load
@@ -65,13 +66,10 @@ function titleExists(title, type) {
         const inputTitle = title.toLowerCase();
         const inputType = (type || '').toLowerCase();
 
-        if (existingTitle === inputTitle) {
-            if (!existingType && !inputType) return true;
-            if (existingType === inputType) return true;
-        }
-        return false;
+        return existingTitle === inputTitle && existingType === inputType;
     });
 }
+
 
 function showStatus(message, color, shake) {
     statusElement.textContent = message;
