@@ -1,50 +1,55 @@
+let currentPanelTile = null;
+const statusElement = document.querySelector('.status');
+const resultDiv = document.getElementById('result');
+const sidePanelId = 'sidePanel';
+const colors = {
+    gold: 'gold',
+    gray: 'gray',
+    red: 'red',
+    transparent: 'transparent',
+    favoriteBg: '#ff4d4d',
+    unfavoriteBg: '#333',
+    panelBg: '#1a1a1a',
+    panelText: '#f0f0f0',
+    panelBorder: '#333',
+    panelInputBg: '#2a2a2a'
+};
+
+const existingTitles = [
+
+];
+
 document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') initiateSearch();
 });
 
-const existingTitles = [
-    { title: "Title 1", type: "Type A" },
-    { title: "Title 2", type: "Type B" },
-    { title: "Title 3", type: "Type A" },
-    { title: "Title 4", type: "" }
-];
 
 function initiateSearch() {
     const searchValue = document.getElementById('searchInput').value.trim();
     if (!searchValue) return;
 
-    const regex = /`(.*?)`/g;
-    const match = searchValue.match(regex);
+    const { text, extractedType } = extractSearchDetails(searchValue);
 
-    const text = searchValue.replace(regex, '').trim();
-
-    let extractedType = "";
-    if (match) {
-        extractedType = match.map(item => item.replace(/`/g, '')).join(' ');
-    }
-
-    // Check for duplicates
     if (titleExists(text, extractedType)) {
-        const statusElement = document.querySelector('.status');
-        statusElement.textContent = 'Title Already Exists';
-        statusElement.style.color = 'red';
-        statusElement.classList.add('shake');
-        setTimeout(() => statusElement.classList.remove('shake'), 1000);
+        showStatus('Title Already Exists', colors.red, true);
         return;
     }
 
-    // Add the new title to the existingTitles array
     existingTitles.push({ title: text, type: extractedType });
-
-    const statusElement = document.querySelector('.status');
-    statusElement.textContent = 'Fetching image...';
-    statusElement.style.color = ''; // Reset color
+    showStatus('Fetching image...', '', false);
 
     const newSearchValue = (text + " " + extractedType).trim();
     window.api.sendSearch(newSearchValue);
     document.getElementById('searchInput').value = '';
 }
 
+function extractSearchDetails(searchValue) {
+    const regex = /`(.*?)`/g;
+    const match = searchValue.match(regex);
+    const text = searchValue.replace(regex, '').trim();
+    const extractedType = match ? match.map(item => item.replace(/`/g, '')).join(' ') : "";
+    return { text, extractedType };
+}
 
 function titleExists(title, type) {
     return existingTitles.some(item => {
@@ -53,17 +58,22 @@ function titleExists(title, type) {
         const inputTitle = title.toLowerCase();
         const inputType = (type || '').toLowerCase();
 
-        // Check for duplicate title and type combination
         if (existingTitle === inputTitle) {
-            // If no type is provided in either existing or input, consider it a match
             if (!existingType && !inputType) return true;
-            // If types are provided, they must match
             if (existingType === inputType) return true;
         }
         return false;
     });
 }
 
+function showStatus(message, color, shake) {
+    statusElement.textContent = message;
+    statusElement.style.color = color;
+    if (shake) {
+        statusElement.classList.add('shake');
+        setTimeout(() => statusElement.classList.remove('shake'), 1000);
+    }
+}
 
 function toCamelCase(string) {
     return string
@@ -72,16 +82,9 @@ function toCamelCase(string) {
         .join(' ');
 }
 
-let currentPanelTile = null;
-
 window.api.onImageResult((imageUrl, searchValue) => {
     searchValue = searchValue.trim();
-
-    const regex = /`(.*?)`/g;
-    const cleanTitle = toCamelCase(searchValue.replace(regex, '').trim());
-
-    const resultDiv = document.getElementById('result');
-    const statusElement = document.querySelector('.status');
+    const cleanTitle = toCamelCase(searchValue.replace(/`(.*?)`/g, '').trim());
 
     if (imageUrl) {
         const tile = createTile(cleanTitle, imageUrl);
@@ -96,41 +99,34 @@ function createTile(title, imageUrl) {
     const tile = document.createElement('div');
     tile.className = 'tile';
 
-    // Image element
     const img = document.createElement('img');
     img.src = imageUrl;
     img.setAttribute('draggable', 'false');
 
-    // Non-editable title
     const titleDiv = document.createElement('div');
     titleDiv.className = 'tile-title';
     titleDiv.textContent = title;
 
-    // Description container
     const description = document.createElement('div');
     description.className = 'description';
 
-    // Editable rating
-    const rating = createRating(0); // Start rating at 0
+    const rating = createRating(0);
 
-    // Heart icon for favorite
     const heartIcon = document.createElement('div');
     heartIcon.className = 'heart-icon';
     heartIcon.textContent = '❤️';
-    heartIcon.style.color = 'transparent';
+    heartIcon.style.color = colors.transparent;
 
     img.addEventListener('dblclick', () => {
         toggleFavorite(heartIcon, tile);
         if (currentPanelTile === tile) updatePanel();
     });
 
-    // Open side panel on tile click
     tile.addEventListener('click', () => {
         currentPanelTile = tile;
         showSidePanel(tile, title, imageUrl, rating);
     });
 
-    // Append elements
     description.appendChild(titleDiv);
     description.appendChild(rating);
     tile.appendChild(img);
@@ -147,9 +143,9 @@ function createRating(initialRating) {
         const star = document.createElement('span');
         star.textContent = '★';
         star.dataset.rating = i;
-        star.style.color = i <= initialRating ? 'gold' : 'gray'; // Start with the initial rating
+        star.style.color = i <= initialRating ? colors.gold : colors.gray;
         star.addEventListener('click', () => {
-            updateRating(rating, i); // Update rating in tile
+            updateRating(rating, i);
             if (currentPanelTile) updatePanel();
         });
         rating.appendChild(star);
@@ -160,29 +156,29 @@ function createRating(initialRating) {
 function updateRating(ratingElement, ratingValue) {
     const stars = ratingElement.querySelectorAll('span');
     stars.forEach((star, index) => {
-        star.style.color = index < ratingValue ? 'gold' : 'gray';
+        star.style.color = index < ratingValue ? colors.gold : colors.gray;
     });
 }
 
 function toggleFavorite(heartIcon, tile) {
-    const isFavorited = heartIcon.style.color === 'red';
-    heartIcon.style.color = isFavorited ? 'transparent' : 'red';
+    const isFavorited = heartIcon.style.color === colors.red;
+    heartIcon.style.color = isFavorited ? colors.transparent : colors.red;
     if (currentPanelTile === tile) updatePanel();
 }
 
 function showSidePanel(tile, title, imageUrl, tileRating) {
-    let sidePanel = document.getElementById('sidePanel');
+    let sidePanel = document.getElementById(sidePanelId);
     if (!sidePanel) {
         sidePanel = document.createElement('div');
-        sidePanel.id = 'sidePanel';
+        sidePanel.id = sidePanelId;
         sidePanel.style.cssText = `
             position: fixed;
             top: 0;
             right: 0;
             width: 300px;
             height: 100%;
-            background: #1a1a1a;
-            color: #f0f0f0;
+            background: ${colors.panelBg};
+            color: ${colors.panelText};
             padding: 20px;
             box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
             z-index: 1000;
@@ -199,7 +195,7 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
             <button id="closePanel" style="
                 background: none;
                 border: none;
-                color: #f0f0f0;
+                color: ${colors.panelText};
                 font-size: 18px;
                 cursor: pointer;
                 position: absolute;
@@ -210,10 +206,10 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
             <input type="text" id="panelTitle" value="${tile.querySelector('.tile-title').textContent}" style="
                 width: 100%;
                 padding: 5px;
-                border: 1px solid #333;
+                border: 1px solid ${colors.panelBorder};
                 border-radius: 4px;
-                background: #2a2a2a;
-                color: #f0f0f0;
+                background: ${colors.panelInputBg};
+                color: ${colors.panelText};
                 outline: none;
                 ">
         </div>
@@ -227,48 +223,43 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
                 padding: 5px 10px;
                 border: none;
                 border-radius: 4px;
-                background: ${tile.querySelector('.heart-icon').style.color === 'red' ? '#ff4d4d' : '#333'};
-                color: #f0f0f0;
+                background: ${tile.querySelector('.heart-icon').style.color === colors.red ? colors.favoriteBg : colors.unfavoriteBg};
+                color: ${colors.panelText};
                 cursor: pointer;">
-                ${tile.querySelector('.heart-icon').style.color === 'red' ? 'Unfavorite' : 'Favorite'}
+                ${tile.querySelector('.heart-icon').style.color === colors.red ? 'Unfavorite' : 'Favorite'}
             </button>
         </div>
     `;
 
-    // Close panel
     document.getElementById('closePanel').addEventListener('click', () => {
         sidePanel.style.display = 'none';
         currentPanelTile = null;
     });
 
-    // Sync title
     document.getElementById('panelTitle').addEventListener('input', (e) => {
         tile.querySelector('.tile-title').textContent = e.target.value;
     });
 
-    // Sync favorite
     document.getElementById('panelFavorite').addEventListener('click', (e) => {
         const heartIcon = tile.querySelector('.heart-icon');
         toggleFavorite(heartIcon, tile);
-        e.target.textContent = heartIcon.style.color === 'red' ? 'Unfavorite' : 'Favorite';
-        e.target.style.background = heartIcon.style.color === 'red' ? '#ff4d4d' : '#333';
+        e.target.textContent = heartIcon.style.color === colors.red ? 'Unfavorite' : 'Favorite';
+        e.target.style.background = heartIcon.style.color === colors.red ? colors.favoriteBg : colors.unfavoriteBg;
     });
 
-    // Sync rating in the side panel
     const panelRating = document.getElementById('panelRating');
-    panelRating.innerHTML = ''; // Clear existing stars
+    panelRating.innerHTML = '';
 
-    const currentRating = Array.from(tileRating.querySelectorAll('span')).filter(star => star.style.color === 'gold').length;
-    
-    // Create stars for side panel based on current rating
+    const currentRating = Array.from(tileRating.querySelectorAll('span')).filter(star => star.style.color === colors.gold).length;
+
     for (let i = 1; i <= 5; i++) {
         const star = document.createElement('span');
         star.textContent = '★';
         star.dataset.rating = i;
-        star.style.color = i <= currentRating ? 'gold' : 'gray'; // Sync with the current rating
+        star.style.color = i <= currentRating ? colors.gold : colors.gray;
         star.addEventListener('click', () => {
-            updateRating(panelRating, i); // Update panel rating
-            updateRating(tileRating, i);  // Update tile rating
+            updateRating(panelRating, i);
+            updateRating(tileRating, i);
         });
         panelRating.appendChild(star);
     }
@@ -278,29 +269,32 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
 
 function updatePanel() {
     if (!currentPanelTile) return;
-
-    const heartIcon = currentPanelTile.querySelector('.heart-icon');
-    const isFavorited = heartIcon.style.color === 'red';
-    const panelFavoriteButton = document.getElementById('panelFavorite');
-
-    // Sync favorite
-    panelFavoriteButton.textContent = isFavorited ? 'Unfavorite' : 'Favorite';
-    panelFavoriteButton.style.background = isFavorited ? '#ff4d4d' : '#333';
+    updateFavoriteButton(currentPanelTile.querySelector('.heart-icon'));
 }
 
-// Add CSS for shake animation
-const style = document.createElement('style');
-style.innerHTML = `
-    .shake {
-        animation: shake 0.5s;
-    }
+function updateFavoriteButton(heartIcon) {
+    const isFavorited = heartIcon.style.color === colors.red;
+    const panelFavoriteButton = document.getElementById('panelFavorite');
+    panelFavoriteButton.textContent = isFavorited ? 'Unfavorite' : 'Favorite';
+    panelFavoriteButton.style.background = isFavorited ? colors.favoriteBg : colors.unfavoriteBg;
+}
 
-    @keyframes shake {
-        0% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        50% { transform: translateX(5px); }
-        75% { transform: translateX(-5px); }
-        100% { transform: translateX(0); }
-    }
-`;
-document.head.appendChild(style);
+addShakeAnimationCSS();
+
+function addShakeAnimationCSS() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+    `;
+    document.head.appendChild(style);
+}
