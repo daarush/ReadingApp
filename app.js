@@ -5,7 +5,8 @@
 // TODO: Add tags + notes
 // TODO: save/load
 // TODO: bulk add / queue
-
+// TODO: hide/show image (blur)
+// ========== constants =======
 let currentPanelTile = null;
 const statusElement = document.querySelector('.status');
 const resultDiv = document.getElementById('result');
@@ -23,14 +24,12 @@ const colors = {
     panelInputBg: '#2a2a2a'
 };
 
-const existingTitles = [
+const existingTitles = [];
 
-];
-
+// ========== searchbar =======
 document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') initiateSearch();
 });
-
 
 function initiateSearch() {
     const searchValue = document.getElementById('searchInput').value.trim();
@@ -70,7 +69,7 @@ function titleExists(title, type) {
     });
 }
 
-
+// ========== status =======
 function showStatus(message, color, shake) {
     statusElement.textContent = message;
     statusElement.style.color = color;
@@ -80,98 +79,27 @@ function showStatus(message, color, shake) {
     }
 }
 
-function toCamelCase(string) {
-    return string
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
+function addShakeAnimationCSS() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
-window.api.onImageResult((imageUrl, searchValue) => {
-    searchValue = searchValue.trim();
-    const cleanTitle = toCamelCase(searchValue.replace(/`(.*?)`/g, '').trim());
+addShakeAnimationCSS();
 
-    if (imageUrl) {
-        const tile = createTile(cleanTitle, imageUrl);
-        resultDiv.appendChild(tile);
-        statusElement.textContent = 'Image fetched successfully.';
-    } else {
-        statusElement.textContent = 'No image found.';
-    }
-});
-
-function createTile(title, imageUrl) {
-    const tile = document.createElement('div');
-    tile.className = 'tile';
-    tile.style.animation = 'fadeIn 0.5s ease-in-out';
-
-    const img = document.createElement('img');
-    img.src = imageUrl;
-    img.setAttribute('draggable', 'false');
-
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'tile-title';
-    titleDiv.textContent = title;
-
-    const description = document.createElement('div');
-    description.className = 'description';
-
-    const rating = createRating(0);
-
-    const heartIcon = document.createElement('div');
-    heartIcon.className = 'heart-icon';
-    heartIcon.textContent = '❤️';
-    heartIcon.style.color = colors.transparent;
-
-    img.addEventListener('dblclick', () => {
-        toggleFavorite(heartIcon, tile);
-        if (currentPanelTile === tile) updatePanel();
-    });
-
-    tile.addEventListener('click', () => {
-        currentPanelTile = tile;
-        showSidePanel(tile, title, imageUrl, rating);
-    });
-
-    description.appendChild(titleDiv);
-    description.appendChild(rating);
-    tile.appendChild(img);
-    tile.appendChild(description);
-    tile.appendChild(heartIcon);
-    return tile;
-}
-
-function createRating(initialRating) {
-    const rating = document.createElement('div');
-    rating.className = 'rating';
-
-    for (let i = 1; i <= 5; i++) {
-        const star = document.createElement('span');
-        star.textContent = '★';
-        star.dataset.rating = i;
-        star.style.color = i <= initialRating ? colors.gold : colors.gray;
-        star.addEventListener('click', () => {
-            updateRating(rating, i);
-            if (currentPanelTile) updatePanel();
-        });
-        rating.appendChild(star);
-    }
-    return rating;
-}
-
-function updateRating(ratingElement, ratingValue) {
-    const stars = ratingElement.querySelectorAll('span');
-    stars.forEach((star, index) => {
-        star.style.color = index < ratingValue ? colors.gold : colors.gray;
-    });
-}
-
-function toggleFavorite(heartIcon, tile) {
-    const isFavorited = heartIcon.style.color === colors.red;
-    heartIcon.style.color = isFavorited ? colors.transparent : colors.red;
-    if (currentPanelTile === tile) updatePanel();
-}
-
+// ========== side/edit panel =======
 function showSidePanel(tile, title, imageUrl, tileRating) {
     let sidePanel = document.getElementById(sidePanelId);
     if (!sidePanel) {
@@ -291,22 +219,95 @@ function updateFavoriteButton(heartIcon) {
     panelFavoriteButton.style.background = isFavorited ? colors.favoriteBg : colors.unfavoriteBg;
 }
 
-addShakeAnimationCSS();
+// ========== tile creation =======
+window.api.onImageResult((imageUrl, searchValue) => {
+    searchValue = searchValue.trim();
+    const cleanTitle = toCamelCase(searchValue.replace(/`(.*?)`/g, '').trim());
 
-function addShakeAnimationCSS() {
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .shake {
-            animation: shake 0.5s;
-        }
+    if (imageUrl) {
+        const tile = createTile(cleanTitle, imageUrl);
+        resultDiv.appendChild(tile);
+        statusElement.textContent = 'Image fetched successfully.';
+    } else {
+        statusElement.textContent = 'No image found.';
+    }
+});
 
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-    `;
-    document.head.appendChild(style);
+function createTile(title, imageUrl) {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.style.animation = 'fadeIn 0.5s ease-in-out';
+
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.setAttribute('draggable', 'false');
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'tile-title';
+    titleDiv.textContent = title;
+
+    const description = document.createElement('div');
+    description.className = 'description';
+
+    const rating = createRating(0);
+
+    const heartIcon = document.createElement('div');
+    heartIcon.className = 'heart-icon';
+    heartIcon.textContent = '❤️';
+    heartIcon.style.color = colors.transparent;
+
+    img.addEventListener('dblclick', () => {
+        toggleFavorite(heartIcon, tile);
+        if (currentPanelTile === tile) updatePanel();
+    });
+
+    tile.addEventListener('click', () => {
+        currentPanelTile = tile;
+        showSidePanel(tile, title, imageUrl, rating);
+    });
+
+    description.appendChild(titleDiv);
+    description.appendChild(rating);
+    tile.appendChild(img);
+    tile.appendChild(description);
+    tile.appendChild(heartIcon);
+    return tile;
+}
+
+function createRating(initialRating) {
+    const rating = document.createElement('div');
+    rating.className = 'rating';
+
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.textContent = '★';
+        star.dataset.rating = i;
+        star.style.color = i <= initialRating ? colors.gold : colors.gray;
+        star.addEventListener('click', () => {
+            updateRating(rating, i);
+            if (currentPanelTile) updatePanel();
+        });
+        rating.appendChild(star);
+    }
+    return rating;
+}
+
+function updateRating(ratingElement, ratingValue) {
+    const stars = ratingElement.querySelectorAll('span');
+    stars.forEach((star, index) => {
+        star.style.color = index < ratingValue ? colors.gold : colors.gray;
+    });
+}
+
+function toggleFavorite(heartIcon, tile) {
+    const isFavorited = heartIcon.style.color === colors.red;
+    heartIcon.style.color = isFavorited ? colors.transparent : colors.red;
+    if (currentPanelTile === tile) updatePanel();
+}
+
+function toCamelCase(string) {
+    return string
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
 }
