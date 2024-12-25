@@ -6,6 +6,8 @@
 // TODO: save/load
 // TODO: bulk add / queue
 // TODO: hide/show image (blur)
+
+//TODO: whenever i edit the title, the existingTitles array should be updated with a new coloumn
 // ========== constants =======
 let currentPanelTile = null;
 const statusElement = document.querySelector('.status');
@@ -166,23 +168,45 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
                 ${tile.querySelector('.heart-icon').style.color === colors.red ? 'Unfavorite' : 'Favorite'}
             </button>
         </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button id="deleteTile" style="
+                padding: 10px 15px;
+                border: none;
+                border-radius: 4px;
+                background: ${colors.red};
+                color: white;
+                cursor: pointer;">
+                Delete Tile
+            </button>
+        </div>
     `;
 
+    // Close panel handler
     document.getElementById('closePanel').addEventListener('click', () => {
         sidePanel.style.transform = 'translateX(100%)';
         sidePanel.style.opacity = '0';
         currentPanelTile = null;
     });
 
+    // Title input handler
     document.getElementById('panelTitle').addEventListener('input', (e) => {
         tile.querySelector('.tile-title').textContent = e.target.value;
     });
 
+    // Favorite button handler
     document.getElementById('panelFavorite').addEventListener('click', (e) => {
         const heartIcon = tile.querySelector('.heart-icon');
         toggleFavorite(heartIcon, tile);
         e.target.textContent = heartIcon.style.color === colors.red ? 'Unfavorite' : 'Favorite';
         e.target.style.background = heartIcon.style.color === colors.red ? colors.favoriteBg : colors.unfavoriteBg;
+    });
+
+    // Delete tile handler
+    document.getElementById('deleteTile').addEventListener('click', () => {
+        deleteTile(tile, title);
+        sidePanel.style.transform = 'translateX(100%)';
+        sidePanel.style.opacity = '0';
+        currentPanelTile = null;
     });
 
     const panelRating = document.getElementById('panelRating');
@@ -205,6 +229,18 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
     sidePanel.style.transform = 'translateX(0)';
     sidePanel.style.opacity = '1';
     sidePanel.style.display = 'flex';
+}
+
+function deleteTile(tile, title) {
+    // Remove tile from DOM
+    tile.remove();
+
+    // Remove title from existingTitles
+    const titleIndex = existingTitles.findIndex(item => item.title === title);
+    if (titleIndex !== -1) existingTitles.splice(titleIndex, 1);
+
+    // Update status
+    showStatus(`Tile "${title}" deleted successfully.`, colors.red, false);
 }
 
 function updatePanel() {
