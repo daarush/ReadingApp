@@ -17,7 +17,7 @@ function createWindow() {
         autoHideMenuBar: true
     });
 
-    win.loadFile('index.html');
+    win.loadFile(path.join(__dirname, '../renderer/index.html'));
     win.maximize();
 }
 

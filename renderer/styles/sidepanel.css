@@ -1,0 +1,11 @@
+/* Side Panel */
+#sidePanel {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+#sidePanel.show {
+    transform: translateX(0);
+    opacity: 1;
+}

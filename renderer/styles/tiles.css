@@ -1,0 +1,121 @@
+/* Tiles */
+#result {
+    margin: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    transition: opacity 0.3s ease;
+}
+
+.tile {
+    position: relative;
+    width: 150px;
+    height: 220px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #222;
+    cursor: pointer;
+    text-align: center;
+    color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, height 0.3s ease;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.tile:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    height: 230px;
+    animation: bounce 1s;
+}
+
+.tile img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+.tile-title {
+    font-weight: bold;
+    margin: 5px 0;
+    transition: color 0.3s ease;
+}
+
+.tile:hover .tile-title {
+    color: #ffffff;
+}
+
+.tile:hover .description {
+    display: block;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.description {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 12px;
+    opacity: 0;
+}
+
+.rating {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    transition: opacity 0.3s ease;
+}
+
+.rating span {
+    cursor: pointer;
+    color: gold;
+    transition: transform 0.3s ease;
+}
+
+.rating span:hover {
+    transform: scale(1.2);
+}
+
+.heart-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 18px;
+    color: transparent;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.tile:hover .heart-icon {
+    color: #ff5722;
+    transform: scale(1.2);
+}
+
+.toggle-button {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    transition: color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+
+.toggle-button:hover {
+    color: white;
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.2);
+}
