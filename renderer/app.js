@@ -6,8 +6,8 @@
 // TODO: save/load
 // TODO: bulk add / queue
 // TODO: hide/show image (blur)
-
 //TODO: whenever i edit the title, the existingTitles array should be updated with a new coloumn
+
 // ========== constants =======
 let currentPanelTile = null;
 const statusElement = document.querySelector('.status');
@@ -63,6 +63,99 @@ function extractSearchDetails(searchValue) {
 function titleExists(title, type) {
     const existingType = existingTitles.get(title);
     return existingType && existingType.toLowerCase() === (type || '').toLowerCase();
+}
+
+// ========== tile creation =======
+window.api.onImageResult((imageUrl, searchValue) => {
+    searchValue = searchValue.trim();
+    const cleanTitle = toCamelCase(searchValue.replace(/`(.*?)`/g, '').trim());
+
+    if (imageUrl) {
+        const tile = createTile(cleanTitle, imageUrl);
+        resultDiv.appendChild(tile);
+        statusElement.textContent = 'Image fetched successfully.';
+    } else {
+        statusElement.textContent = 'No image found.';
+    }
+});
+
+function createTile(title, imageUrl) {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.style.animation = 'fadeIn 0.5s ease-in-out';
+
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.setAttribute('draggable', 'false');
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'tile-title';
+    titleDiv.textContent = title;
+
+    const description = document.createElement('div');
+    description.className = 'description';
+
+    const rating = createRating(0);
+
+    const heartIcon = document.createElement('div');
+    heartIcon.className = 'heart-icon';
+    heartIcon.textContent = '❤️';
+    heartIcon.style.color = colors.transparent;
+
+    img.addEventListener('dblclick', () => {
+        toggleFavorite(heartIcon, tile);
+        if (currentPanelTile === tile) updatePanel();
+    });
+
+    tile.addEventListener('click', () => {
+        currentPanelTile = tile;
+        showSidePanel(tile, title, imageUrl, rating);
+    });
+
+    description.appendChild(titleDiv);
+    description.appendChild(rating);
+    tile.appendChild(img);
+    tile.appendChild(description);
+    tile.appendChild(heartIcon);
+    return tile;
+}
+
+function createRating(initialRating) {
+    const rating = document.createElement('div');
+    rating.className = 'rating';
+
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.textContent = '★';
+        star.dataset.rating = i;
+        star.style.color = i <= initialRating ? colors.gold : colors.gray;
+        star.addEventListener('click', () => {
+            updateRating(rating, i);
+            if (currentPanelTile) updatePanel();
+        });
+        rating.appendChild(star);
+    }
+    return rating;
+}
+
+function updateRating(ratingElement, ratingValue) {
+    const stars = ratingElement.querySelectorAll('span');
+    stars.forEach((star, index) => {
+        star.style.color = index < ratingValue ? colors.gold : colors.gray;
+    });
+}
+
+function toggleFavorite(heartIcon, tile) {
+    const isFavorited = heartIcon.style.color === colors.red;
+    heartIcon.style.color = isFavorited ? colors.transparent : colors.red;
+    if (currentPanelTile === tile) updatePanel();
+}
+
+function toCamelCase(string) {
+    return string
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
 }
 
 // ========== status =======
@@ -246,97 +339,4 @@ function updateFavoriteButton(heartIcon) {
     const panelFavoriteButton = document.getElementById('panelFavorite');
     panelFavoriteButton.textContent = isFavorited ? 'Unfavorite' : 'Favorite';
     panelFavoriteButton.style.background = isFavorited ? colors.favoriteBg : colors.unfavoriteBg;
-}
-
-// ========== tile creation =======
-window.api.onImageResult((imageUrl, searchValue) => {
-    searchValue = searchValue.trim();
-    const cleanTitle = toCamelCase(searchValue.replace(/`(.*?)`/g, '').trim());
-
-    if (imageUrl) {
-        const tile = createTile(cleanTitle, imageUrl);
-        resultDiv.appendChild(tile);
-        statusElement.textContent = 'Image fetched successfully.';
-    } else {
-        statusElement.textContent = 'No image found.';
-    }
-});
-
-function createTile(title, imageUrl) {
-    const tile = document.createElement('div');
-    tile.className = 'tile';
-    tile.style.animation = 'fadeIn 0.5s ease-in-out';
-
-    const img = document.createElement('img');
-    img.src = imageUrl;
-    img.setAttribute('draggable', 'false');
-
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'tile-title';
-    titleDiv.textContent = title;
-
-    const description = document.createElement('div');
-    description.className = 'description';
-
-    const rating = createRating(0);
-
-    const heartIcon = document.createElement('div');
-    heartIcon.className = 'heart-icon';
-    heartIcon.textContent = '❤️';
-    heartIcon.style.color = colors.transparent;
-
-    img.addEventListener('dblclick', () => {
-        toggleFavorite(heartIcon, tile);
-        if (currentPanelTile === tile) updatePanel();
-    });
-
-    tile.addEventListener('click', () => {
-        currentPanelTile = tile;
-        showSidePanel(tile, title, imageUrl, rating);
-    });
-
-    description.appendChild(titleDiv);
-    description.appendChild(rating);
-    tile.appendChild(img);
-    tile.appendChild(description);
-    tile.appendChild(heartIcon);
-    return tile;
-}
-
-function createRating(initialRating) {
-    const rating = document.createElement('div');
-    rating.className = 'rating';
-
-    for (let i = 1; i <= 5; i++) {
-        const star = document.createElement('span');
-        star.textContent = '★';
-        star.dataset.rating = i;
-        star.style.color = i <= initialRating ? colors.gold : colors.gray;
-        star.addEventListener('click', () => {
-            updateRating(rating, i);
-            if (currentPanelTile) updatePanel();
-        });
-        rating.appendChild(star);
-    }
-    return rating;
-}
-
-function updateRating(ratingElement, ratingValue) {
-    const stars = ratingElement.querySelectorAll('span');
-    stars.forEach((star, index) => {
-        star.style.color = index < ratingValue ? colors.gold : colors.gray;
-    });
-}
-
-function toggleFavorite(heartIcon, tile) {
-    const isFavorited = heartIcon.style.color === colors.red;
-    heartIcon.style.color = isFavorited ? colors.transparent : colors.red;
-    if (currentPanelTile === tile) updatePanel();
-}
-
-function toCamelCase(string) {
-    return string
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
 }
