@@ -26,7 +26,7 @@ const colors = {
     panelInputBg: '#2a2a2a'
 };
 
-const existingTitles = [];
+const existingTitles = new Map();
 
 // ========== searchbar =======
 document.getElementById('searchInput').addEventListener('keypress', (e) => {
@@ -44,7 +44,7 @@ function initiateSearch() {
         return;
     }
 
-    existingTitles.push({ title: text, type: extractedType });
+    existingTitles.set(text, extractedType);
     showStatus('Fetching image...', '', false);
 
     const newSearchValue = (text + " " + extractedType).trim();
@@ -61,14 +61,8 @@ function extractSearchDetails(searchValue) {
 }
 
 function titleExists(title, type) {
-    return existingTitles.some(item => {
-        const existingTitle = item.title.toLowerCase();
-        const existingType = (item.type || '').toLowerCase();
-        const inputTitle = title.toLowerCase();
-        const inputType = (type || '').toLowerCase();
-
-        return existingTitle === inputTitle && existingType === inputType;
-    });
+    const existingType = existingTitles.get(title);
+    return existingType && existingType.toLowerCase() === (type || '').toLowerCase();
 }
 
 // ========== status =======
@@ -236,8 +230,7 @@ function deleteTile(tile, title) {
     tile.remove();
 
     // Remove title from existingTitles
-    const titleIndex = existingTitles.findIndex(item => item.title === title);
-    if (titleIndex !== -1) existingTitles.splice(titleIndex, 1);
+    existingTitles.delete(title);
 
     // Update status
     showStatus(`Tile "${title}" deleted successfully.`, colors.red, false);
