@@ -22,6 +22,25 @@
     animation: fadeIn 0.5s ease-in-out;
 }
 
+.main-tile-title {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.8);
+    font-size: 12px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s 0.3s;
+}
+
+.tile:hover .main-tile-title {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s 0s;
+}
+
 .tile:hover {
     transform: translateY(-8px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
@@ -34,6 +53,7 @@
     height: 250px;
     object-fit: cover;
     transition: opacity 0.3s ease;
+    user-select: none;
 }
 
 .tile-title {

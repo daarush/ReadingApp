@@ -19,7 +19,7 @@ class Tile {
         const img = this.createElement('img', { src: this.imageUrl, draggable: 'false' });
         const titleDiv = this.createElement('div', { className: 'tile-title', textContent: this.title });
         const description = this.createElement('div', { className: 'description' });
-        
+        const title = this.createElement('div', { className: 'main-tile-title', textContent: this.title });
         const rating = this.createRating();
         const heartIcon = this.createHeartIcon();
 
@@ -27,7 +27,7 @@ class Tile {
         this.setupTileEvents(this.tileElement, img, heartIcon, rating);
 
         description.append(titleDiv, rating);
-        this.tileElement.append(img, description, heartIcon);
+        this.tileElement.append(img, description, heartIcon, title);
         return this.tileElement;
     }
 
