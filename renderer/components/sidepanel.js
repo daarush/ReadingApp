@@ -131,6 +131,10 @@ class SidePanel {
         button.textContent = isFavorite ? 'Favorite' : 'Unfavorite';
         button.style.background = isFavorite ? colors.unfavoriteBg : colors.favoriteBg;
     }
+
+    deleteTile() {
+        this.tile.remove();
+    }
 }
 
 export default SidePanel;
