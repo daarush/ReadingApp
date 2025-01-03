@@ -33,7 +33,7 @@ ipcMain.on('search-images', async (event, searchValue) => {
       const url = `https://duckduckgo.com/?q=${newSearchValue.replaceAll(" ", "+")}&va=b&t=hc&iar=images&iax=images&ia=images`;
 
       await page.goto(url, { waitUntil: 'networkidle2' });
-      await page.waitForSelector('img');
+      await page.waitForSelector('img', { timeout: 60000, visible: true });
 
       const firstImageSource = await page.evaluate(() => {
           // Get all image elements

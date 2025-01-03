@@ -6,7 +6,9 @@
 // TODO: save/load
 // TODO: bulk add / queue
 // TODO: hide/show image (blur)
-//TODO: whenever i edit the title, the existingTitles array should be updated with a new coloumn
+// TODO: whenever i edit the title, the existingTitles array should be updated with a new coloumn
+
+import { initiateSearch } from "./components/searchbar.js";
 
 // ========== constants =======
 let currentPanelTile = null;
@@ -26,45 +28,10 @@ const colors = {
     panelInputBg: '#2a2a2a'
 };
 
-const existingTitles = new Map();
-
 // ========== searchbar =======
 document.getElementById('searchInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') initiateSearch();
 });
-
-function initiateSearch() {
-    const searchValue = document.getElementById('searchInput').value.trim();
-    if (!searchValue) return;
-
-    const { text, extractedType } = extractSearchDetails(searchValue);
-
-    if (titleExists(text, extractedType)) {
-        showStatus('Title Already Exists', colors.red, true);
-        return;
-    }
-
-    existingTitles.set(text, extractedType);
-    showStatus('Fetching image...', '', false);
-
-    const newSearchValue = (text + " " + extractedType).trim();
-    window.api.sendSearch(newSearchValue);
-    document.getElementById('searchInput').value = '';
-}
-
-function extractSearchDetails(searchValue) {
-    const regex = /`(.*?)`/g;
-    const match = searchValue.match(regex);
-    const text = searchValue.replace(regex, '').trim();
-    const extractedType = match ? match.map(item => item.replace(/`/g, '')).join(' ') : "";
-    return { text, extractedType };
-}
-
-function titleExists(title, type) {
-    const existingType = existingTitles.get(title);
-    return existingType && existingType.toLowerCase() === (type || '').toLowerCase();
-}
-
 // ========== tile creation =======
 window.api.onImageResult((imageUrl, searchValue) => {
     searchValue = searchValue.trim();
@@ -157,36 +124,6 @@ function toCamelCase(string) {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ');
 }
-
-// ========== status =======
-function showStatus(message, color, shake) {
-    statusElement.textContent = message;
-    statusElement.style.color = color;
-    if (shake) {
-        statusElement.classList.add('shake');
-        setTimeout(() => statusElement.classList.remove('shake'), 1000);
-    }
-}
-
-function addShakeAnimationCSS() {
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .shake {
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-addShakeAnimationCSS();
 
 // ========== side/edit panel =======
 function showSidePanel(tile, title, imageUrl, tileRating) {
@@ -316,17 +253,6 @@ function showSidePanel(tile, title, imageUrl, tileRating) {
     sidePanel.style.transform = 'translateX(0)';
     sidePanel.style.opacity = '1';
     sidePanel.style.display = 'flex';
-}
-
-function deleteTile(tile, title) {
-    // Remove tile from DOM
-    tile.remove();
-
-    // Remove title from existingTitles
-    existingTitles.delete(title);
-
-    // Update status
-    showStatus(`Tile "${title}" deleted successfully.`, colors.red, false);
 }
 
 function updatePanel() {
