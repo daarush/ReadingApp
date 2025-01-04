@@ -55,17 +55,24 @@ class SidePanel {
                 <label id="panelRatingLabel">Rating: </label>
                 <div id="panelRating" class="rating"></div>
             </div>
-            <div style="margin-top: 20px; text-align: center;">
-                <button id="deleteTile">Delete Tile</button>
+            <div id="panelTagsContainer">
+                <div id="panelTagsInputContainer">
+                    <label id="panelTagsLabel">Tags: </label>
+                    <div id="panelTagsInput" contenteditable="true"></div>
+                </div>
+                <div id="panelTags"></div>
+            </div>
+            <div id="panelNotesContainer">
+                <label id="panelNotesLabel">Notes: </label>
+                <div id="panelNotes" contenteditable="true"></div>
+            </div>
+            <div style="margin-top: 20px; text-align: center; padding-bottom: 20px;">
+                <button id="deleteTile">Delete</button>
             </div>
         `;
 
         this.panel.querySelector('#closePanel').addEventListener('click', () => {
-            this.panel.style.transform = 'translateX(100%)';
-            this.panel.style.opacity = '0';
-            this.isPanelOpen = false;
-            this.removeMouseMoveEffect();
-            showStatus('Side panel closed');
+            this.closePanel();
         });
 
         this.panel.querySelector('#panelTitle').addEventListener('input', (e) => {
@@ -81,12 +88,19 @@ class SidePanel {
 
         this.panel.querySelector('#deleteTile').addEventListener('click', () => {
             this.deleteTile();
-            this.panel.style.transform = 'translateX(100%)';
-            this.panel.style.opacity = '0';
-            this.isPanelOpen = false;
-            this.removeMouseMoveEffect();
-            showStatus('Tile deleted');
         });
+
+        this.panel.querySelector('#panelTagsInput').addEventListener('keydown', (e) => {
+            this.manageTags(e);
+        });
+    }
+
+    closePanel() {
+        this.panel.style.transform = 'translateX(100%)';
+        this.panel.style.opacity = '0';
+        this.isPanelOpen = false;
+        this.removeMouseMoveEffect();
+        showStatus('Side panel closed');
     }
 
     addMouseMoveEffect() {
@@ -157,6 +171,64 @@ class SidePanel {
         this.panel.remove();
         this.tile.remove();
         showStatus('Tile deleted');
+    }
+
+    manageTags(e) {
+        if (e.code === "Enter" || e.code === "Tab") {
+            e.preventDefault();
+            let tagName = e.target.textContent.trim();
+            if (tagName.length) {
+                const tagElement = this.createElement('span', { textContent: tagName, className: 'tag' });
+    
+                // Create the 'x' button
+                const removeTagButton = this.createElement('span', { textContent: 'x', className: 'remove-tag' });
+                removeTagButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent propagation to avoid triggering other events
+                
+                    // Add the 'removing' class to trigger fade-out animation
+                    tagElement.classList.add('removing');
+                
+                    // Wait for the fade-out animation to finish before removing the element
+                    setTimeout(() => {
+                        tagElement.remove();
+                        showStatus('Tag removed');
+                    }, 300); // Match the fade-out duration
+                });
+                
+    
+                // Ensure the 'x' is always appended during mouseover on the tag
+                tagElement.addEventListener('mouseover', () => {
+                    if (!tagElement.contains(removeTagButton)) {
+                        tagElement.appendChild(removeTagButton);
+                    }
+                });
+    
+                // Add 'mouseout' event for both the tag and the remove button
+                const handleMouseOut = () => {
+                    if (!tagElement.matches(':hover') && !removeTagButton.matches(':hover')) {
+                        tagElement.removeChild(removeTagButton);
+                    }
+                };
+    
+                tagElement.addEventListener('mouseout', handleMouseOut);
+                removeTagButton.addEventListener('mouseout', handleMouseOut);
+    
+                // Add the tag to the panel
+                this.panel.querySelector('#panelTags').appendChild(tagElement);
+    
+                // Clear input after adding tag
+                e.target.textContent = '';
+                showStatus('Tag added');
+            }
+        }
+    }
+
+    createElement(tag, attributes) {
+        const element = document.createElement(tag);
+        for (let key in attributes) {
+            element[key] = attributes[key];
+        }
+        return element;
     }
 }
 

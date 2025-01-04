@@ -1,7 +1,7 @@
 :root {
     --panel-text-color: #ffffff;
     --panel-border-color: #000000;
-    --panel-input-bg-color: #0e0e0e;
+    --panel-input-bg-color: #151515;
     --red-color: #ff0000;
 }
 
@@ -21,6 +21,8 @@
     transform: translateX(100%);
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
+    overflow: auto;
+    scrollbar-width: none;
 }
 
 #sidePanel.show {
@@ -107,7 +109,7 @@
 }
 
 #panelTitle:hover {
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 #deleteTile {
@@ -140,4 +142,172 @@
 
 #panelRatingLabel {
     margin-top: 10px;
+}
+
+#panelTagsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#panelTagsInputContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#panelTagsLabel {
+    margin-right: 1px;
+}
+
+#panelTagsInput {
+    padding: 5px;
+    font-size: 14px;
+    min-width: 50px;
+    background-color: var(--panel-input-bg-color);
+    color: white;
+    outline: none;
+    border-radius: 2px;
+    border: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#panelTagsInput[contenteditable="true"]:empty:before {
+    content: "Type here to add tags";
+    color: #999;
+    font-style: italic;
+}
+
+#panelTags {
+    border-radius: 4px;
+    max-width: 80%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+#panelTags .tag {
+    padding: 10px 10px;
+    background-color: #2a2e3d;
+    color: white;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+}
+
+#panelNotesContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#panelNotes {
+    min-width: 50%;
+    max-width: 80%;
+    min-height: 50px;
+    background-color: var(--panel-input-bg-color);
+    color: white;
+    outline: none;
+    border-radius: 2px;
+    border: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 10px;
+}
+
+#panelTags .tag span {
+    margin-left: 10px;
+    color: gray;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+#panelTags .tag span:hover {
+    color: red;
+}
+
+
+#panelTags .tag {
+    padding: 10px 10px;
+    background-color: #2a2e3d;
+    color: white;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    position: relative;
+    overflow: hidden;
+    width: auto;
+    transition: all 0.3s ease; /* Smooth transition for expansion */
+}
+
+/* Hover Effect (when 'x' is added) */
+#panelTags .tag:hover {
+    padding: 10px 20px; /* Expand padding */
+    background-color: #3a3e53; /* Slight color change on hover */
+}
+
+/* Remove Button ('x') Styles */
+#panelTags .tag span {
+    margin-left: 10px;
+    color: gray;
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+#panelTags .tag span:hover {
+    color: red;
+}
+
+/* Fade Out Animation for Tag Removal */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+/* Tag Removal Style */
+#panelTags .tag.removing {
+    animation: fadeOut 0.3s forwards; /* Apply fadeOut animation */
+}
+
+/* Transition for the side panel */
+#sidePanel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 99%;
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#sidePanel.show {
+    transform: translateX(0);
+    opacity: 1;
 }

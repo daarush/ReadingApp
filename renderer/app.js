@@ -1,12 +1,3 @@
-// TODO: Add differnt border colors for different types (create a random color for every new type)
-// TODO: image regeneration
-// TODO: Differentiate between title and type
-// TODO: Add tags + notes
-// TODO: save/load
-// TODO: bulk add / queue
-// TODO: hide/show image (blur)
-// TODO: whenever i edit the title, the existingTitles array should be updated with a new coloumn
-
 import { initiateSearch } from "./components/searchbar.js";
 import Tile from "./components/tile.js";
 
