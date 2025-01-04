@@ -32,24 +32,6 @@ class SidePanel {
     createPanel() {
         this.panel = document.createElement('div');
         this.panel.id = this.panelId;
-        this.panel.style.cssText = `
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 300px;
-            height: 100%;
-            background: ${colors.panelBg};
-            color: ${colors.panelText};
-            padding: 20px;
-            box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            transform: translateX(100%);
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        `;
         document.body.appendChild(this.panel);
 
         this.panel.innerHTML = `
@@ -133,6 +115,7 @@ class SidePanel {
     }
 
     deleteTile() {
+        this.panel.remove();
         this.tile.remove();
     }
 }
