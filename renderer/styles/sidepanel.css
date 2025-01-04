@@ -3,7 +3,7 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 300px;
+    width: 400px;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.9);
     padding: 20px;
@@ -20,4 +20,49 @@
 #sidePanel.show {
     transform: translateX(0);
     opacity: 1;
+}
+
+#sidePanel img {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: scale-down;
+    margin-top: 20px;
+    border-radius: 15px;
+}
+
+#panelFavorite {
+    color: white;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    padding: 5px 10px; 
+    border: none; 
+    border-radius: 4px; 
+    width: 50%;  
+    margin: 0 auto; 
+    display: block;  
+}
+
+#panelFavorite:hover{
+    transform: scale(1.1);  
+}
+
+#panelRating {
+    display: flex;  /* Makes the stars appear in a row */
+    gap: 5px;  /* Space between each star */
+}
+
+#panelRating .star {
+    font-size: 24px;
+    color: #ccc;
+    transition: transform 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+#panelRating .star:hover {
+    color: gold;  /* Color change on hover */
+    transform: scale(1.2);  /* Animation effect to make the stars grow slightly */
+}
+
+#panelRating .star:active {
+    transform: scale(1);  /* Return to normal size when clicked */
 }

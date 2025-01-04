@@ -3,10 +3,10 @@ export const colors = {
     gray: 'gray',
     red: 'red',
     transparent: 'transparent',
-    favoriteBg: '#ff4d4d',
-    unfavoriteBg: '#333',
-    panelBg: '#1a1a1a',
-    panelText: '#f0f0f0',
-    panelBorder: '#333',
-    panelInputBg: '#2a2a2a'
+    favoriteBg: 'rgba(255, 77, 77, 0.4)',
+    unfavoriteBg: 'rgba(51, 51, 51, 1)',
+    panelBg: 'rgba(26, 26, 26, 1)',
+    panelText: 'rgba(240, 240, 240, 1)',
+    panelBorder: 'rgba(51, 51, 51, 1)',
+    panelInputBg: 'rgba(42, 42, 42, 1)'
 };
