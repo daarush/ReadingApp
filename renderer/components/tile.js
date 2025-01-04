@@ -1,7 +1,8 @@
 import SidePanel from "./sidepanel.js";  // Import the SidePanel class
 import { colors } from "./constants.js";  // Import colors
 
-let currentPanelTile = null;
+let currentSidePanel = null; // Track the currently open side panel
+let currentPanelTile = null; // Track the tile associated with the currently open side panel
 
 class Tile {
     constructor(title, imageUrl) {
@@ -10,6 +11,7 @@ class Tile {
         this.isFavorite = false;
         this.rating = 0;
         this.tileElement = null;
+        this.sidePanelInstance = null;
     }
 
     createTile() {
@@ -54,21 +56,28 @@ class Tile {
         }
         return rating;
     }
-    
 
     setupTileEvents(tile, img, heartIcon, rating) {
-        // Double-click handler for favoriting the tile
-        img.addEventListener('dblclick', () => {
-            this.toggleFavorite(heartIcon);
-            if (currentPanelTile === tile) this.updatePanel();
-        });
-
         // Click handler for opening the side panel
         tile.addEventListener('click', () => {
             currentPanelTile = tile;
+
+            // Close the currently open side panel (if any)
+            if (currentSidePanel && currentSidePanel !== this.sidePanelInstance) {
+                currentSidePanel.panel.style.transform = 'translateX(100%)';
+                currentSidePanel.panel.style.opacity = '0';
+            }
+
+            // Create a new SidePanel only if one doesn't already exist for this tile
+            if (!this.sidePanelInstance) {
+                this.sidePanelInstance = new SidePanel(this.tileElement, this.title, this.imageUrl, rating);
+            }
+
+            // Set the global reference to the current side panel
+            currentSidePanel = this.sidePanelInstance;
+
             // Show the side panel with necessary information
-            const sidePanel = new SidePanel(this.tileElement, this.title, this.imageUrl, rating);
-            sidePanel.showSidePanel();
+            this.sidePanelInstance.showSidePanel();
         });
     }
 
