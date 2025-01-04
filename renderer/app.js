@@ -1,4 +1,3 @@
-// TODO: Add a way to remove tiles
 // TODO: Add differnt border colors for different types (create a random color for every new type)
 // TODO: image regeneration
 // TODO: Differentiate between title and type
