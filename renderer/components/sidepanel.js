@@ -10,9 +10,7 @@ class SidePanel {
     }
 
     showSidePanel() {
-        if (!this.panel) {
-            this.createPanel();
-        }
+        if (!this.panel) this.createPanel();
 
         const titleElement = this.tile.querySelector('.tile-title');
         const heartIcon = this.tile.querySelector('.heart-icon');
@@ -45,6 +43,10 @@ class SidePanel {
             <div class="parallax-container">
                 <img src="${this.tile.querySelector('img').src}" class="parallax-img">
             </div>
+            <div id="panelImageManager">
+                <button id="regenImage">Find New Image</button>
+                <button id="toggleImage">Hide Image</button>
+            </div>
             <div style="margin-top: 20px;">
                 <input type="text" id="panelTitle">
             </div>
@@ -71,28 +73,30 @@ class SidePanel {
             </div>
         `;
 
-        this.panel.querySelector('#closePanel').addEventListener('click', () => {
-            this.closePanel();
-        });
-
+        this.panel.querySelector('#regenImage').addEventListener('click', () => this.regenerateImage());
+        this.panel.querySelector('#toggleImage').addEventListener('click', () => this.toggleImage());
+        this.panel.querySelector('#closePanel').addEventListener('click', () => this.closePanel());
         this.panel.querySelector('#panelTitle').addEventListener('input', (e) => {
             this.tile.querySelector('.tile-title').textContent = e.target.value;
             showStatus('Title updated');
         });
-
         this.panel.querySelector('#panelFavorite').addEventListener('click', (e) => {
             const heartIcon = this.tile.querySelector('.heart-icon');
             this.toggleFavorite(heartIcon, e.target);
             showStatus('Favorite status toggled');
         });
+        this.panel.querySelector('#deleteTile').addEventListener('click', () => this.deleteTile());
+        this.panel.querySelector('#panelTagsInput').addEventListener('keydown', (e) => this.manageTags(e));
+    }
 
-        this.panel.querySelector('#deleteTile').addEventListener('click', () => {
-            this.deleteTile();
-        });
+    regenerateImage() {}
 
-        this.panel.querySelector('#panelTagsInput').addEventListener('keydown', (e) => {
-            this.manageTags(e);
-        });
+    toggleImage() {
+        const image = this.panel.querySelector('.parallax-img');
+        image.classList.toggle('hide');
+        this.panel.querySelector('#toggleImage').textContent = image.classList.contains('hide') ? 'Show Image' : 'Hide Image';
+        this.tile.querySelector('img').classList.toggle('hide');
+        showStatus('Image visibility toggled');
     }
 
     closePanel() {
@@ -179,44 +183,33 @@ class SidePanel {
             let tagName = e.target.textContent.trim();
             if (tagName.length) {
                 const tagElement = this.createElement('span', { textContent: tagName, className: 'tag' });
-    
-                // Create the 'x' button
+
                 const removeTagButton = this.createElement('span', { textContent: 'x', className: 'remove-tag' });
                 removeTagButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent propagation to avoid triggering other events
-                
-                    // Add the 'removing' class to trigger fade-out animation
+                    e.stopPropagation();
                     tagElement.classList.add('removing');
-                
-                    // Wait for the fade-out animation to finish before removing the element
                     setTimeout(() => {
                         tagElement.remove();
                         showStatus('Tag removed');
-                    }, 300); // Match the fade-out duration
+                    }, 300);
                 });
-                
-    
-                // Ensure the 'x' is always appended during mouseover on the tag
+
                 tagElement.addEventListener('mouseover', () => {
                     if (!tagElement.contains(removeTagButton)) {
                         tagElement.appendChild(removeTagButton);
                     }
                 });
-    
-                // Add 'mouseout' event for both the tag and the remove button
+
                 const handleMouseOut = () => {
                     if (!tagElement.matches(':hover') && !removeTagButton.matches(':hover')) {
                         tagElement.removeChild(removeTagButton);
                     }
                 };
-    
+
                 tagElement.addEventListener('mouseout', handleMouseOut);
                 removeTagButton.addEventListener('mouseout', handleMouseOut);
-    
-                // Add the tag to the panel
+
                 this.panel.querySelector('#panelTags').appendChild(tagElement);
-    
-                // Clear input after adding tag
                 e.target.textContent = '';
                 showStatus('Tag added');
             }

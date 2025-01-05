@@ -52,8 +52,13 @@
     width: 100%;
     height: 250px;
     object-fit: cover;
-    transition: opacity 0.3s ease;
+    transition: filter 0.3s ease, opacity 0.3s ease;
     user-select: none;
+}
+
+.tile img.hide {
+    filter: blur(5px);
+    opacity: 0.5;
 }
 
 .tile-title {

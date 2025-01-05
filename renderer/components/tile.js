@@ -1,8 +1,8 @@
-import SidePanel from "./sidepanel.js";  // Import the SidePanel class
-import { colors } from "./constants.js";  // Import colors
+import SidePanel from "./sidepanel.js";
+import { colors } from "./constants.js";
 
-let currentSidePanel = null; // Track the currently open side panel
-let currentPanelTile = null; // Track the tile associated with the currently open side panel
+let currentSidePanel = null;
+let currentPanelTile = null;
 
 class Tile {
     constructor(title, imageUrl) {
@@ -15,17 +15,15 @@ class Tile {
     }
 
     createTile() {
-        // Create tile elements
         this.tileElement = this.createElement('div', { className: 'tile', style: 'animation: fadeIn 0.5s ease-in-out;' });
 
-        const img = this.createElement('img', { src: this.imageUrl, draggable: 'false' });
+        const img = this.createElement('img', { className: 'tile-image', src: this.imageUrl, draggable: 'false' });
         const titleDiv = this.createElement('div', { className: 'tile-title', textContent: this.title });
         const description = this.createElement('div', { className: 'description' });
         const title = this.createElement('div', { className: 'main-tile-title', textContent: this.title });
         const rating = this.createRating();
         const heartIcon = this.createHeartIcon();
 
-        // Set up events for tile interactions
         this.setupTileEvents(this.tileElement, img, heartIcon, rating);
 
         description.append(titleDiv, rating);
@@ -49,8 +47,8 @@ class Tile {
         const rating = this.createElement('div', { className: 'rating' });
         for (let i = 1; i <= 5; i++) {
             const star = this.createElement('span', { textContent: '★' });
-            star.dataset.rating = i; // Set the dataset here
-            star.style.color = i <= this.rating ? colors.gold : colors.gray; // Initial style
+            star.dataset.rating = i;
+            star.style.color = i <= this.rating ? colors.gold : colors.gray;
             star.addEventListener('click', () => this.updateRating(rating, i));
             rating.appendChild(star);
         }
@@ -58,25 +56,19 @@ class Tile {
     }
 
     setupTileEvents(tile, img, heartIcon, rating) {
-        // Click handler for opening the side panel
         tile.addEventListener('click', () => {
             currentPanelTile = tile;
 
-            // Close the currently open side panel (if any)
             if (currentSidePanel && currentSidePanel !== this.sidePanelInstance) {
                 currentSidePanel.panel.style.transform = 'translateX(100%)';
                 currentSidePanel.panel.style.opacity = '0';
             }
 
-            // Create a new SidePanel only if one doesn't already exist for this tile
             if (!this.sidePanelInstance) {
                 this.sidePanelInstance = new SidePanel(this.tileElement, this.title, this.imageUrl, rating);
             }
 
-            // Set the global reference to the current side panel
             currentSidePanel = this.sidePanelInstance;
-
-            // Show the side panel with necessary information
             this.sidePanelInstance.showSidePanel();
         });
     }
