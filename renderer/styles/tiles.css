@@ -1,3 +1,19 @@
+:root {
+    --border-color: #444;
+    --background-color: #222;
+    --text-color: white;
+    --hover-shadow-color: rgba(0, 0, 0, 0.5);
+    --hover-color: #ffffff;
+    --description-bg-color: rgba(0, 0, 0, 0.8);
+    --rating-color: gold;
+    --heart-icon-color: #ff5722;
+    --toggle-button-color: rgba(255, 255, 255, 0.7);
+    --toggle-button-bg-color: rgba(0, 0, 0, 0.4);
+    --toggle-button-hover-color: white;
+    --toggle-button-hover-bg-color: rgba(0, 0, 0, 0.8);
+    --favorite-box-shadow: 0 0 10px 2px rgba(255, 87, 34, 0.8);
+}
+
 /* Tiles */
 #result {
     margin: 20px;
@@ -11,15 +27,23 @@
     position: relative;
     width: 150px;
     height: 220px;
-    border: 1px solid #444;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     overflow: hidden;
-    background-color: #222;
+    background-color: var(--background-color);
     cursor: pointer;
     text-align: center;
-    color: white;
+    color: var(--text-color);
     transition: transform 0.3s ease, box-shadow 0.3s ease, height 0.3s ease;
     animation: fadeIn 0.5s ease-in-out;
+}
+
+.tile.favorited {
+    box-shadow: var(--favorite-box-shadow);
+}
+
+.tile.favorited:hover {
+    border: 1px solid var(--heart-icon-color);
 }
 
 .main-tile-title {
@@ -28,7 +52,7 @@
     bottom: 0;
     left: 0;
     padding: 5px;
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--description-bg-color);
     font-size: 12px;
     opacity: 1;
     visibility: visible;
@@ -43,7 +67,7 @@
 
 .tile:hover {
     transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 20px var(--hover-shadow-color);
     height: 230px;
     animation: bounce 1s;
 }
@@ -68,7 +92,7 @@
 }
 
 .tile:hover .tile-title {
-    color: #ffffff;
+    color: var(--hover-color);
 }
 
 .tile:hover .description {
@@ -84,7 +108,7 @@
     left: 0;
     right: 0;
     padding: 10px;
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--description-bg-color);
     color: white;
     font-size: 12px;
     opacity: 0;
@@ -99,7 +123,7 @@
 
 .rating span {
     cursor: pointer;
-    color: gold;
+    color: var(--rating-color);
     transition: transform 0.3s ease;
 }
 
@@ -117,7 +141,7 @@
 }
 
 .tile:hover .heart-icon {
-    color: #ff5722;
+    color: var(--heart-icon-color);
     transform: scale(1.2);
 }
 
@@ -127,8 +151,8 @@
     left: 5px;
     font-size: 14px;
     cursor: pointer;
-    color: rgba(255, 255, 255, 0.7);
-    background: rgba(0, 0, 0, 0.4);
+    color: var(--toggle-button-color);
+    background: var(--toggle-button-bg-color);
     padding: 2px;
     border-radius: 50%;
     display: flex;
@@ -140,7 +164,7 @@
 }
 
 .toggle-button:hover {
-    color: white;
-    background: rgba(0, 0, 0, 0.8);
+    color: var(--toggle-button-hover-color);
+    background: var(--toggle-button-hover-bg-color);
     transform: scale(1.2);
 }

@@ -18,8 +18,8 @@ class SidePanel {
         const tileRating = this.tile.querySelector('.rating');
 
         this.panel.querySelector('#panelTitle').value = titleElement.textContent;
-        this.panel.querySelector('#panelFavorite').textContent = heartIcon.style.color === colors.red ? '❤️ Favorited' : '❤️ Favorite';
-        this.panel.querySelector('#panelFavorite').style.background = heartIcon.style.color === colors.red ? colors.favoriteBg : colors.unfavoriteBg;
+        this.panel.querySelector('#panelFavorite').textContent = this.tile.classList.contains('favorited') ? '❤️ Favorited' : '❤️ Favorite';
+        this.panel.querySelector('#panelFavorite').style.background = this.tile.classList.contains('favorited') ? colors.favoriteBg : colors.unfavoriteBg;
 
         this.updateRatingStars(tileRating);
 
@@ -189,8 +189,12 @@ class SidePanel {
     }
 
     toggleFavorite(heartIcon, button) {
-        const isFavorite = heartIcon.style.color === colors.red;
-        heartIcon.style.color = isFavorite ? colors.transparent : colors.red;
+        const isFavorite = this.tile.classList.contains('favorited');
+        if (isFavorite) {
+            this.tile.classList.remove('favorited');
+        } else {
+            this.tile.classList.add('favorited');
+        }
         button.textContent = isFavorite ? '❤️ Favorite' : '❤️ Favorited';
         button.style.background = isFavorite ? colors.unfavoriteBg : colors.favoriteBg;
         showStatus('Favorite status toggled');
