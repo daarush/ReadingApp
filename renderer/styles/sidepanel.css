@@ -294,3 +294,49 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 10px;
 }
+
+#panelStatusContainer {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#panelStatusLabel {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#panelStatus {
+    width: 30%;
+    padding: 5px;
+    border: 1px solid var(--panel-border-color);
+    border-radius: 4px;
+    background: var(--panel-input-bg-color);
+    color: var(--panel-text-color);
+    outline: none;
+    transition: box-shadow 0.3s ease;
+}
+
+#panelStatus:hover {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.status-option {
+    padding: 5px 10px;
+    background-color: var(--blue-gray-color);
+    border-radius: 4px;
+    color: var(--panel-text-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.status-option.active {
+    background-color: var(--red-color);
+}
+
+.status-option:hover {
+    background-color: var(--red-color);
+}

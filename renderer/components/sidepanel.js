@@ -7,6 +7,7 @@ class SidePanel {
         this.panel = null;
         this.panelId = 'sidePanel';
         this.isPanelOpen = false;
+        this.statusOptions = ['Planned', 'In Progress', 'On Hold', 'Completed', 'Abandoned'];
     }
 
     showSidePanel() {
@@ -21,6 +22,9 @@ class SidePanel {
         this.panel.querySelector('#panelFavorite').style.background = heartIcon.style.color === colors.red ? colors.favoriteBg : colors.unfavoriteBg;
 
         this.updateRatingStars(tileRating);
+
+        const currentStatus = this.tile.getAttribute('data-status') || 'Planned';
+        this.panel.querySelector('#panelStatus').value = currentStatus;
 
         this.panel.style.transform = 'translateX(0)';
         this.panel.style.opacity = '1';
@@ -57,6 +61,10 @@ class SidePanel {
                 <label id="panelRatingLabel">Rating: </label>
                 <div id="panelRating" class="rating"></div>
             </div>
+            <div id="panelStatusContainer">
+                <label id="panelStatusLabel">Status:</label>
+                <select id="panelStatus"></select>
+            </div>
             <div id="panelTagsContainer">
                 <div id="panelTagsInputContainer">
                     <label id="panelTagsLabel">Tags: </label>
@@ -73,6 +81,7 @@ class SidePanel {
             </div>
         `;
 
+        this.createStatusOptions();
         this.panel.querySelector('#regenImage').addEventListener('click', () => this.regenerateImage());
         this.panel.querySelector('#toggleImage').addEventListener('click', () => this.toggleImage());
         this.panel.querySelector('#closePanel').addEventListener('click', () => this.closePanel());
@@ -87,6 +96,22 @@ class SidePanel {
         });
         this.panel.querySelector('#deleteTile').addEventListener('click', () => this.deleteTile());
         this.panel.querySelector('#panelTagsInput').addEventListener('keydown', (e) => this.manageTags(e));
+        this.panel.querySelector('#panelStatus').addEventListener('change', (e) => this.setStatus(e.target.value));
+    }
+
+    createStatusOptions() {
+        const statusSelect = this.panel.querySelector('#panelStatus');
+        this.statusOptions.forEach((status) => {
+            const option = document.createElement('option');
+            option.value = status;
+            option.textContent = status;
+            statusSelect.appendChild(option);
+        });
+    }
+
+    setStatus(status) {
+        this.tile.setAttribute('data-status', status);
+        showStatus(`Status updated to "${status}"`);
     }
 
     regenerateImage() {}
